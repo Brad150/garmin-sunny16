@@ -1,3 +1,17 @@
 developer_key
 .cursor/*
 AGENTS.MD
+
+# Garmin Connect IQ Build Artifacts
+bin/
+*.prg
+*.iq
+*.iq.zip
+
+# VS Code / Connect IQ Extension settings & cache
+.vscode/
+.iq/
+
+# Windows system metadata
+Thumbs.db
+desktop.ini
