@@ -1,3 +1,21 @@
 <strings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
-    <string id="AppName">sunny16</string>
+    <string id="AppName" scope="glance">Sunny 16</string>
+    <string id="IsoPrefix" scope="glance">ISO </string>
+    <string id="CondSnowSand" scope="glance">Snow/Sand</string>
+    <string id="CondSunny" scope="glance">Sunny</string>
+    <string id="CondSlightOvercast" scope="glance">Slight Overcast</string>
+    <string id="CondOvercast" scope="glance">Overcast</string>
+    <string id="CondHeavyOvercast" scope="glance">Heavy Overcast</string>
+    <string id="CondOpenShade" scope="glance">Open Shade</string>
+    <string id="CondSunset" scope="glance">Sunset</string>
+    <string id="Aperture22" scope="glance">f/22</string>
+    <string id="Aperture16" scope="glance">f/16</string>
+    <string id="Aperture11" scope="glance">f/11</string>
+    <string id="Aperture8" scope="glance">f/8</string>
+    <string id="Aperture56" scope="glance">f/5.6</string>
+    <string id="Aperture4" scope="glance">f/4</string>
+    <string id="Aperture28" scope="glance">f/2.8</string>
+    <string id="ShutterPrefix" scope="glance">1/</string>
+    <string id="HintOpen">Start to adjust</string>
+    <string id="HintControls">Up/Dn light  Start ISO</string>
 </strings>
