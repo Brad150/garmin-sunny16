@@ -27,7 +27,7 @@ class sunny16GlanceView extends WatchUi.GlanceView {
             0,
             height / 2,
             Graphics.FONT_SMALL,
-            Sunny16State.exposureLabel(),
+            Sunny16State.selectedPairLabel(),
             Graphics.TEXT_JUSTIFY_LEFT
         );
 

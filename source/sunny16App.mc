@@ -22,7 +22,8 @@ class sunny16App extends Application.AppBase {
             interactive = settings.isGlanceModeEnabled;
         }
 
-        return [new sunny16View(interactive), new sunny16Delegate(interactive)];
+        var view = new sunny16View(interactive);
+        return [view, new sunny16Delegate(view)];
     }
 
     (:glance)
