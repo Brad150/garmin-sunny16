@@ -16,12 +16,12 @@ class sunny16Delegate extends WatchUi.BehaviorDelegate {
             return true;
         }
 
-        if (_view.step == Sunny16Step.ISO) {
-            _view.step = Sunny16Step.LIGHT;
-        } else if (_view.step == Sunny16Step.LIGHT) {
+        if (_view.step == Sunny16Step.LIGHT) {
             _view.step = Sunny16Step.SCALE;
         } else if (_view.step == Sunny16Step.SCALE) {
             Sunny16State.resetOffset();
+        } else if (_view.step == Sunny16Step.ISO) {
+            _view.step = _view.isoReturn;
         }
 
         WatchUi.requestUpdate();
@@ -34,12 +34,26 @@ class sunny16Delegate extends WatchUi.BehaviorDelegate {
             WatchUi.requestUpdate();
             return true;
         }
-        if (_view.step == Sunny16Step.LIGHT) {
-            _view.step = Sunny16Step.ISO;
+        if (_view.step == Sunny16Step.ISO) {
+            _view.step = _view.isoReturn;
             WatchUi.requestUpdate();
             return true;
         }
         return false;
+    }
+
+    function onMenu() as Boolean {
+        if (!_view.isInteractive()) {
+            return false;
+        }
+        if (_view.step == Sunny16Step.ISO) {
+            return true;
+        }
+
+        _view.isoReturn = _view.step;
+        _view.step = Sunny16Step.ISO;
+        WatchUi.requestUpdate();
+        return true;
     }
 
     function onPreviousPage() as Boolean {

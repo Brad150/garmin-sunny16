@@ -1,5 +1,6 @@
 import Toybox.Graphics;
 import Toybox.Lang;
+import Toybox.Math;
 import Toybox.WatchUi;
 
 module Sunny16Step {
@@ -11,13 +12,15 @@ module Sunny16Step {
 
 class sunny16View extends WatchUi.View {
     var step as Number;
+    var isoReturn as Number;
     hidden var _interactive as Boolean;
 
     function initialize(interactive as Boolean) {
         View.initialize();
         _interactive = interactive;
+        isoReturn = Sunny16Step.LIGHT;
         if (_interactive) {
-            step = Sunny16Step.ISO;
+            step = Sunny16Step.LIGHT;
         } else {
             step = Sunny16Step.SUMMARY;
         }
@@ -122,9 +125,9 @@ class sunny16View extends WatchUi.View {
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
         dc.drawText(
             cx,
-            height * 16 / 100,
+            height * 14 / 100,
             Graphics.FONT_TINY,
-            WatchUi.loadResource(Rez.Strings.StepLight) as String,
+            Sunny16State.isoLabel(),
             Graphics.TEXT_JUSTIFY_CENTER
         );
 
@@ -161,76 +164,139 @@ class sunny16View extends WatchUi.View {
 
     hidden function drawScale(dc as Dc, width as Number, height as Number) as Void {
         var cx = width / 2;
+        var centerY = height / 2;
+        var radius = width / 2;
         var headerFont = Graphics.FONT_XTINY;
-        var headerY = height * 14 / 100;
-        var rowFont = Graphics.FONT_SMALL;
+        var rowFont = Graphics.FONT_TINY;
+        var header = Sunny16State.conditionName() + "  " + Sunny16State.isoLabel();
+        var headerH = dc.getFontHeight(headerFont);
+        var headerW = dc.getTextWidthInPixels(header, headerFont);
         var rowH = dc.getFontHeight(rowFont);
+        var fontH = rowH;
+        var gap = height / 100;
+        var barW = width * 60 / 100;
+        var headerTop = 0;
+        var listTop = 0;
+        var listBottom = 0;
+        var barLimit = 0;
+        var available = 0;
+        var rows = 1;
+        var minOff = 0;
+        var maxOff = 0;
+        var validCount = 0;
+        var selectedPos = 0;
+        var windowTop = 0;
+        var selectedRow = 0;
+        var blockH = 0;
+        var top = 0;
+        var barX = 0;
+        var selectedTop = 0;
+        var apertureX = width * 50 / 100;
+        var shutterX = width * 56 / 100;
+        var markerRadius = 0;
+        var markerX = 0;
+        var offset = 0;
+        var rowTop = 0;
+        var textY = 0;
+        var i = 0;
+
+        if ((height / 2) < radius) {
+            radius = height / 2;
+        }
+        if (gap < 1) {
+            gap = 1;
+        }
+
+        headerTop = centerY - fitRadius(radius, (headerW / 2) + 4);
+        if (headerTop < 0) {
+            headerTop = 0;
+        }
 
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
         dc.drawText(
             cx,
-            headerY,
+            headerTop,
             headerFont,
-            Sunny16State.conditionName() + "  " + Sunny16State.isoLabel(),
+            header,
             Graphics.TEXT_JUSTIFY_CENTER
         );
 
-        var listTop = headerY + dc.getFontHeight(headerFont) + (height * 3 / 100);
-        var listBottom = height * 90 / 100;
-        var available = listBottom - listTop;
-        var rows = 1;
-        if (rowH > 0) {
+        minOff = Sunny16State.minStopOffset();
+        maxOff = Sunny16State.maxStopOffset();
+        validCount = (maxOff - minOff) + 1;
+        if (validCount < 1) {
+            validCount = 1;
+            maxOff = minOff;
+        }
+
+        barLimit = fitRadius(radius, (barW / 2) + 2);
+        listTop = headerTop + headerH + gap;
+        if (listTop < (centerY - barLimit)) {
+            listTop = centerY - barLimit;
+        }
+        listBottom = centerY + barLimit;
+        if (listBottom > height) {
+            listBottom = height;
+        }
+        available = listBottom - listTop;
+        if ((rowH > 0) && (available > rowH)) {
             rows = available / rowH;
         }
-        if (rows > 5) {
-            rows = 5;
-        }
-        if ((rows % 2) == 0) {
-            rows = rows - 1;
+        if (rows > validCount) {
+            rows = validCount;
         }
         if (rows < 1) {
             rows = 1;
         }
 
-        var blockH = rows * rowH;
-        var top = listTop + ((available - blockH) / 2);
-        var mid = rows / 2;
-        var selectedTop = top + (mid * rowH);
-        var barW = width * 72 / 100;
-        var barX = (width - barW) / 2;
+        selectedPos = maxOff - Sunny16State.stopOffset;
+        if (selectedPos < 0) {
+            selectedPos = 0;
+        }
+        if (selectedPos >= validCount) {
+            selectedPos = validCount - 1;
+        }
 
+        windowTop = 0;
+        selectedRow = selectedPos;
+        if (validCount > rows) {
+            windowTop = selectedPos - (rows / 2);
+            if (windowTop < 0) {
+                windowTop = 0;
+            }
+            if (windowTop > (validCount - rows)) {
+                windowTop = validCount - rows;
+            }
+            selectedRow = selectedPos - windowTop;
+        }
+
+        blockH = rows * rowH;
+        top = listTop;
+        if (available > blockH) {
+            top = listTop + ((available - blockH) / 2);
+        }
+
+        barX = (width - barW) / 2;
+        selectedTop = top + (selectedRow * rowH);
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_BLACK);
         dc.fillRectangle(barX, selectedTop, barW, rowH);
 
-        var minOff = Sunny16State.minStopOffset();
-        var maxOff = Sunny16State.maxStopOffset();
-        var apertureX = width * 50 / 100;
-        var shutterX = width * 56 / 100;
-        var radius = rowH / 8;
-        if (radius < 2) {
-            radius = 2;
+        markerRadius = rowH / 8;
+        if (markerRadius < 2) {
+            markerRadius = 2;
         }
-        var markerX = barX + radius + 3;
-        var offset = 0;
-        var rowTop = 0;
-        var textY = 0;
-        var fontH = dc.getFontHeight(rowFont);
+        markerX = barX + markerRadius + 3;
 
-        var i = 0;
         for (i = 0; i < rows; i += 1) {
-            offset = Sunny16State.stopOffset + (mid - i);
-            if ((offset < minOff) || (offset > maxOff)) {
-                continue;
-            }
-
+            offset = maxOff - (windowTop + i);
             rowTop = top + (i * rowH);
             textY = rowTop + ((rowH - fontH) / 2);
             if (offset == 0) {
                 dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_TRANSPARENT);
-                dc.fillCircle(markerX, rowTop + (rowH / 2), radius);
+                dc.fillCircle(markerX, rowTop + (rowH / 2), markerRadius);
             }
 
-            if (i == mid) {
+            if (i == selectedRow) {
                 dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_DK_GRAY);
             } else {
                 dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
@@ -251,5 +317,20 @@ class sunny16View extends WatchUi.View {
                 Graphics.TEXT_JUSTIFY_LEFT
             );
         }
+    }
+
+    // Distance from screen center where a centered span of halfWidth still fits the circle.
+    hidden function fitRadius(radius as Number, halfWidth as Number) as Number {
+        var inside = 0;
+        var root = 0.0;
+        if (halfWidth < 1) {
+            return radius;
+        }
+        if (halfWidth >= radius) {
+            return 0;
+        }
+        inside = (radius * radius) - (halfWidth * halfWidth);
+        root = Math.sqrt(inside);
+        return root.toNumber();
     }
 }

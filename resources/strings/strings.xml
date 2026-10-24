@@ -2,7 +2,6 @@
     <string id="AppName" scope="glance">Sunny 16</string>
     <string id="IsoPrefix" scope="glance">ISO </string>
     <string id="StepIso">ISO</string>
-    <string id="StepLight">Light</string>
     <string id="CondSnowSand" scope="glance">Snow/Sand</string>
     <string id="CondSunny" scope="glance">Sunny</string>
     <string id="CondSlightOvercast" scope="glance">Slight Overcast</string>
@@ -23,6 +22,6 @@
     <string id="ShutterPrefix" scope="glance">1/</string>
     <string id="Shutter1s" scope="glance">1s</string>
     <string id="HintOpen">Start to adjust</string>
-    <string id="HintIso">Up/Dn ISO  Start next</string>
-    <string id="HintLight">Up/Dn light  Start next</string>
+    <string id="HintIso">Up/Dn ISO  Start/Back</string>
+    <string id="HintLight">Up/Dn Start  Hold UP ISO</string>
 </strings>
